@@ -5,7 +5,7 @@ namespace AuthenticationService.Application.CommandHandlers.Users
 {
     public class DeleteUserCommand : ICommand<int>
     {
-        public int Id { get; set; }
+        public int Id { get; init; }
     }
 
     public class DeleteUserCommandHandler : ICommandHandler<DeleteUserCommand, int>
