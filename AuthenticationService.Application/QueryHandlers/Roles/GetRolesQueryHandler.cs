@@ -19,7 +19,7 @@ namespace AuthenticationService.Application.QueryHandlers.Roles
 
         public async Task<IEnumerable<Role>> Handle(GetRolesQuery request, CancellationToken cancellationToken)
         {
-            return await roleRepository.FindAllAsync(cancellationToken);
+            return await roleRepository.FindAllAsync(null, cancellationToken);
         }
     }
 }
