@@ -22,8 +22,7 @@ namespace AuthenticationService.Application.QueryHandlers.UserRoles
 
         public async Task<IEnumerable<UserRoleResponse>> Handle(GetUserRolesByRoleIdQuery request, CancellationToken cancellationToken)
         {
-            var specification = new UserRoleSpecification();
-            specification.Expression = x => x.RoleId == request.RoleId;
+            var specification = new GetUserRoleSpecification(x => x.RoleId == request.RoleId);
             var userRoles = await userRoleRepository.FindAllAsync(specification, cancellationToken);
 
             return MapUserRoleToUserRoleDto(userRoles.ToList());

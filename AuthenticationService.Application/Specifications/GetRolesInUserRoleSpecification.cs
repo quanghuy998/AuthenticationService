@@ -1,13 +1,13 @@
 ﻿using AuthenticationService.Domain.Aggregates.UserRoles;
 using AuthenticationService.Domain.SeedWork;
+using System.Linq.Expressions;
 
 namespace AuthenticationService.Application.Specifications
 {
-    public class UserRoleSpecification : BaseSpecification<UserRole>
+    public class GetRolesInUserRoleSpecification : BaseSpecification<UserRole>
     {
-        public UserRoleSpecification()
+        public GetRolesInUserRoleSpecification(Expression<Func<UserRole, bool>> expression) : base(expression)
         {
-            Includes.Add(x => x.User);
             Includes.Add(x => x.Role);
         }
     }

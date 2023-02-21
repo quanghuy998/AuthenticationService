@@ -8,10 +8,11 @@ namespace AuthenticationService.Domain.SeedWork
         public List<Expression<Func<T, object>>> Includes { get; }
         public List<string> IncludeStrings { get; }
 
-        public BaseSpecification()
+        public BaseSpecification(Expression<Func<T, bool>> expression)
         {
             Includes = new();
             IncludeStrings = new();
+            Expression = expression;
         }
 
         protected virtual void AddInclude(Expression<Func<T, object>> includeExpression)
