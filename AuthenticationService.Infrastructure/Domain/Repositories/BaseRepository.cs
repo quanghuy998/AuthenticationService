@@ -1,5 +1,6 @@
 ﻿using AuthenticationService.Domain.SeedWork;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace AuthenticationService.Infrastructure.Domain.Repositories
 {
@@ -23,12 +24,6 @@ namespace AuthenticationService.Infrastructure.Domain.Repositories
             return DbContext.Set<TAggregate>().FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken)!;
         }
 
-        public Task<IEnumerable<TAggregate>> FindAllAsync(CancellationToken cancellationToken = default)
-        {
-            var queryable = DbContext.Set<TAggregate>().AsQueryable();
-            return Task.FromResult(queryable.AsNoTracking().AsEnumerable());
-        }
-
         public Task CreateAsync(TAggregate aggregate, CancellationToken cancellationToken)
         {
             DbContext.Set<TAggregate>().AddAsync(aggregate, cancellationToken);
@@ -45,6 +40,44 @@ namespace AuthenticationService.Infrastructure.Domain.Repositories
         {
             DbContext.Set<TAggregate>().Remove(aggregate);
             return Task.CompletedTask;
+        }
+
+        public Task<bool> ExistsAsync(IBaseSpecification<TAggregate> specification, CancellationToken cancellationToken = default)
+        {
+            return DbContext.Set<TAggregate>().AnyAsync(specification.Expression, cancellationToken);
+        }
+
+        public Task<TAggregate> FindOneAsync(IBaseSpecification<TAggregate> specification, CancellationToken cancellationToken = default)
+        {
+            if (specification == null) return Task.FromResult(default(TAggregate));
+            var queryable = DbContext.Set<TAggregate>().AsQueryable();
+
+            var queryableResultWithIncludes = specification
+                .Includes.Aggregate(queryable, (current, include) => current.Include(include));
+
+            var secondaryResult = specification.Includes
+                .Aggregate(queryableResultWithIncludes, (current, include) => current.Include(include));
+
+            return secondaryResult.FirstOrDefaultAsync(specification.Expression, cancellationToken);
+        }
+
+        public Task<IEnumerable<TAggregate>> FindAllAsync(IBaseSpecification<TAggregate> specification, CancellationToken cancellationToken = default)
+        {
+            var queryable = DbContext.Set<TAggregate>().AsQueryable();
+            if (specification == null) return Task.FromResult(queryable.AsNoTracking().AsEnumerable());
+
+            var queryableResultWithIncludes = specification.Includes
+                .Aggregate(queryable, (current, include) => current.Include(include));
+
+            var secondaryResult = specification.Includes
+                .Aggregate(queryableResultWithIncludes, (current, include) => current.Include(include));
+
+            var result = secondaryResult
+                .Where(specification.Expression)
+                .AsNoTracking()
+                .AsEnumerable();
+
+            return Task.FromResult(result);
         }
     }
 }

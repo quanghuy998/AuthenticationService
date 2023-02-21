@@ -14,7 +14,7 @@ namespace AuthenticationService.Domain.Aggregates.Users
         public DateTime CreatedTime { get; }
         public DateTime ModifiedTime { get; }
 
-        public List<UserClaim> UserClaims { get; }
+        public List<UserClaim> UserClaims { get; private set; }
         public List<UserRole> UserRoles { get; }
 
         public User(string firstName, string lastName, string email, string userName, string passwordHash, string address) 
@@ -40,6 +40,20 @@ namespace AuthenticationService.Domain.Aggregates.Users
             LastName = lastName;
             Email = email;
             Address = address;
+        }
+
+        public void AddClaim(string claimName)
+        {
+            var claim = new UserClaim(claimName);
+            UserClaims.Add(claim);
+        }
+
+        public void RemoveClaim(int claimId) 
+        {
+            var claim = UserClaims.FirstOrDefault(x => x.Id == claimId);
+            UserClaims.Remove(claim);
+            if (UserClaims is null)
+                UserClaims = new();
         }
     }
 }

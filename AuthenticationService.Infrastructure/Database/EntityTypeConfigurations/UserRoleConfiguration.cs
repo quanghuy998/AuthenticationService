@@ -10,7 +10,10 @@ namespace AuthenticationService.Infrastructure.Database.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<UserRole> builder)
         {
-            builder.HasKey(k => new { k.RoleId, k.UserId });
+            builder.HasKey(k => k.Id);
+
+            builder.HasIndex(k => new { k.RoleId, k.UserId })
+                .IsUnique();
 
             builder.HasOne<User>(x => x.User)
                 .WithMany(x => x.UserRoles)

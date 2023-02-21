@@ -11,6 +11,7 @@ namespace AuthenticationService.Application.CommandHandlers.Users
     public class DeleteUserCommandHandler : ICommandHandler<DeleteUserCommand, int>
     {
         private readonly IUserRepository userRepository;
+
         public DeleteUserCommandHandler(IUserRepository userRepository)
         {
             this.userRepository = userRepository;
