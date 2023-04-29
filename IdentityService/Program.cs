@@ -41,7 +41,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuer = true,
             ValidIssuer = configuration.GetAuthenticationConfig("Issuer")
         };
-    });
+    })
+    .AddCookie();
+
 
 builder.Services.AddAuthorization((Action<AuthorizationOptions>)(options =>
 {

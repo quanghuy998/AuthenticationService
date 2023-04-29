@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static IdentityService.Dtos.UserRequest;
+using IdentityService.Application.Dtos;
+using IdentityService.Domain.Aggregates.Users;
 
 namespace IdentityService.Controllers
 {
@@ -41,7 +43,7 @@ namespace IdentityService.Controllers
             if (!result.IsSuccess)
                 return BadRequest(result.Message);
 
-            return Ok(result.Response);
+            return Ok(mappingUserResponseFromUserAggregate(result.Response));
         }
 
         [HttpGet]
@@ -91,7 +93,7 @@ namespace IdentityService.Controllers
             if (!result.IsSuccess)
                 return BadRequest(result.Message);
 
-            return Ok(result.Response);
+            return Ok(mappingUserResponseFromUserAggregate(result.Response));
         }
 
         [HttpDelete]
@@ -159,6 +161,20 @@ namespace IdentityService.Controllers
                 return BadRequest(result.Message);
 
             return Ok(result.Response);
+        }
+
+        private UserResponse mappingUserResponseFromUserAggregate(User user)
+        {
+            return new UserResponse
+            {
+                Id = user.Id,
+                Address = user.Address,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                CreatedTime = user.CreatedTime,
+                ModifiedTime = user.ModifiedTime,
+            };
         }
     }
 }

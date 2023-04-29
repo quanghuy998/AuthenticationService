@@ -1,4 +1,5 @@
-﻿using IdentityService.Application.QueryHandlers.Users;
+﻿using IdentityService.Application.Extensions;
+using IdentityService.Application.QueryHandlers.Users;
 using IdentityService.Infrastructure.CQRS.Commands;
 using IdentityService.Infrastructure.CQRS.Queries;
 using Microsoft.AspNetCore.Authorization;
@@ -13,12 +14,14 @@ namespace IdentityService.Controllers
         private readonly IQueryBus queryBus;
         private readonly ICommandBus commandBus;
         private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IConfiguration configuration;
 
-        public OAuthController(IQueryBus queryBus, ICommandBus commandBus, IHttpContextAccessor httpContextAccessor)
+        public OAuthController(IQueryBus queryBus, ICommandBus commandBus, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
         {
             this.queryBus = queryBus;
             this.commandBus = commandBus;
             this.httpContextAccessor = httpContextAccessor;
+            this.configuration = configuration;
         }
 
         [HttpPost]
@@ -46,7 +49,8 @@ namespace IdentityService.Controllers
         [Route("oauth/token/validate")]
         public async Task<IActionResult> ValidateUserToken(CancellationToken cancellationToken)
         {
-            if (!User.Identity.IsAuthenticated)
+
+            if (!User.Identity.IsAuthenticated || configuration.IsEnableFeatureFlag("DisableAuthenticationInDevelopment"))
                 return Unauthorized();
 
             var query = new ValidateUserQuery()
@@ -67,7 +71,7 @@ namespace IdentityService.Controllers
             {
                 Secure = true,
                 HttpOnly = isHttpOnly,
-                SameSite = SameSiteMode.Lax,
+                SameSite = SameSiteMode.None,
                 Expires = expires,
                 Domain = "localhost"
             });

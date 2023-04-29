@@ -3,7 +3,7 @@ using IdentityService.Infrastructure.CQRS.Commands;
 
 namespace IdentityService.Application.CommandHandlers.Users
 {
-    public class UpdateUserCommand : ICommand<int>
+    public class UpdateUserCommand : ICommand<User>
     {
         public int Id { get; init; }
         public string FirstName { get; init; }
@@ -12,7 +12,7 @@ namespace IdentityService.Application.CommandHandlers.Users
         public string Address { get; init; }
     }
 
-    public class UpdateUserComandHandler : ICommandHandler<UpdateUserCommand, int>
+    public class UpdateUserComandHandler : ICommandHandler<UpdateUserCommand, User>
     {
         private readonly IUserRepository userRepository;
         public UpdateUserComandHandler(IUserRepository userRepository)
@@ -20,16 +20,16 @@ namespace IdentityService.Application.CommandHandlers.Users
             this.userRepository = userRepository;
         }
 
-        public async Task<CommandResult<int>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
+        public async Task<CommandResult<User>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
             var user = await userRepository.FindOneAsync(request.Id);
             if (user == null)
-                return CommandResult<int>.Error("User is not existing");
+                return CommandResult<User>.Error("User is not existing");
 
             user.UpdateUser(request.FirstName, request.LastName, request.Email, request.Address);
             await userRepository.UpdateAsync(user, cancellationToken);
 
-            return CommandResult<int>.Success(user.Id);
+            return CommandResult<User>.Success(user);
         }
     }
 }

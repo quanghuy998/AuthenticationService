@@ -12,7 +12,7 @@ namespace IdentityService.Domain.Aggregates.Users
         public string PasswordHash { get; }
         public string Address { get; private set; }
         public DateTime CreatedTime { get; }
-        public DateTime ModifiedTime { get; }
+        public DateTime ModifiedTime { get; private set; }
 
         public List<UserClaim> UserClaims { get; private set; }
         public List<UserRole> UserRoles { get; private set; }
@@ -40,6 +40,7 @@ namespace IdentityService.Domain.Aggregates.Users
             LastName = lastName;
             Email = email;
             Address = address;
+            ModifiedTime = DateTime.UtcNow;
         }
 
         public List<string> GetUserClaims()

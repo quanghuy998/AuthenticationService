@@ -1,10 +1,11 @@
-﻿using IdentityService.Application.Helpers;
+﻿using IdentityService.Application.Dtos;
+using IdentityService.Application.Helpers;
 using IdentityService.Domain.Aggregates.Users;
 using IdentityService.Infrastructure.CQRS.Commands;
 
 namespace IdentityService.Application.CommandHandlers.Users
 {
-    public class CreateUserCommand : ICommand<int>
+    public class CreateUserCommand : ICommand<User>
     {
         public string FirstName { get; init; }
         public string LastName { get; init; }
@@ -13,7 +14,7 @@ namespace IdentityService.Application.CommandHandlers.Users
         public string Address { get; init; }
     }
 
-    internal class CreateUserCommandHandler : ICommandHandler<CreateUserCommand, int>
+    internal class CreateUserCommandHandler : ICommandHandler<CreateUserCommand, User>
     {
         private readonly IUserRepository userRepository;
         
@@ -22,13 +23,13 @@ namespace IdentityService.Application.CommandHandlers.Users
             this.userRepository = userRepository;
         }
 
-        public async Task<CommandResult<int>> Handle(CreateUserCommand command, CancellationToken cancellationToken)
+        public async Task<CommandResult<User>> Handle(CreateUserCommand command, CancellationToken cancellationToken)
         {
             var hashedPassword = HashPasswordHelper.HashPassword(command.Password);
             var user = new User(command.FirstName, command.LastName, command.Email, command.Email, hashedPassword, command.Address);
             await userRepository.CreateAsync(user, cancellationToken);
 
-            return CommandResult<int>.Success(user.Id);
+            return CommandResult<User>.Success(user);
         }
     }
 }
